@@ -113,7 +113,6 @@ void green_thread(){
 		enqueue(ready_queue, this->join);
 	}
 	
-	
 	/* Save result of execution */
 	this->retval = result;
 	
@@ -357,7 +356,7 @@ void timer_handler(int sig){
  
  int green_mutex_init(green_mutex_t *mutex){
  	mutex->taken = FALSE;
- 	// Initialize fields
+ 	mutex->mutex_queue = create_queue();
  }
  
  
@@ -365,17 +364,20 @@ void timer_handler(int sig){
  	/* BLOCK THE TIMER INTERRUPT */
 	sigprocmask(SIG_BLOCK, &block, NULL);
  	
- 	green_t *susp = running;
  	if(mutex->taken){
- 		//suspend the running thread
+ 		/* Suspend the running thread */
+ 		green_t *susp = running;
+ 		enqueue(mutex->mutex_queue, susp);
  		
- 		// find next thread
+ 		/* Find next thread */
+ 		green_t *next = dequeue(ready_queue);
+ 		assert(next != NULL);
+ 		
  		running = next;
  		swapcontext(susp->context, next->context);
  	} else {
  		/* Take lock */
  		mutex->taken = TRUE;
- 		//  ....
  	}
  	
  	/* UNBLOCK THE TIMER INTERRUPT */
@@ -387,10 +389,12 @@ void timer_handler(int sig){
  int green_mutex_unlock(green_mutex_t *mutex){
  	/* BLOCK THE TIMER INTERRUPT */
 	sigprocmask(SIG_BLOCK, &block, NULL);
-	
- 	// ..    ?
- 	if(mutex->susp != NULL){
- 		// move susp thread to ready queue
+ 	
+ 	if(mutex->mutex_queue != NULL){
+ 		/* Move susp thread to ready queue */
+ 		green_t *susp = dequeue(mutex->mutex_queue);
+ 		enqueue(ready_queue, susp);
+ 		
  	} else {
  		/* Release lock */
  		mutex->taken = FALSE;
