@@ -3,29 +3,24 @@
 #include "green.h"
 #include <unistd.h>
 
+green_cond_t cond;
 green_mutex_t mutex;
 
-static int shared = 0;
-int zero, one, two;
+int flag = 0;
 
 void *test(void *arg){
 	int id = *(int*)arg;
 	int loop = 10000;
-	for(int i = 0; i < 100000; i++){
-	
-	}
-	
-	for(int i = 0; i < loop; i++){
+	while(loop > 0){
 		green_mutex_lock(&mutex);
-		if(id == 0){
-			zero++;
-		} else if(id == 1){
-			one++;
-		} else {
-			two++;
+		printf("thread %d: %d\n", id, loop);
+		while(flag != id){
+			green_cond_wait(&cond, &mutex);
 		}
-		shared++;
+		flag = (id + 1) % 2;
+		green_cond_signal(&cond);
 		green_mutex_unlock(&mutex);
+		loop--;
 	}
 	return NULL;
 }
@@ -34,24 +29,19 @@ void *test(void *arg){
 
 int main(){
 	
-	green_t g0, g1, g2;
+	green_t g0, g1;
 	
 	int a0 = 0;
 	int a1 = 1;
-	int a2 = 2;
 	
+	green_cond_init(&cond);
 	green_mutex_init(&mutex);
 
 	green_create(&g0, test, &a0);
 	green_create(&g1, test, &a1);
-	green_create(&g2, test, &a2);
 	
 	green_join(&g0, NULL);
 	green_join(&g1, NULL);
-	green_join(&g2, NULL);
-	
-	printf("zero: %d \t one: %d \t two: %d\n", zero, one, two);
-	printf("Total sum should be: %d\n", shared);
 	
 	printf("Done with everything!\n");
 	

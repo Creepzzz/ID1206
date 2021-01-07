@@ -3,18 +3,20 @@
 #include "green.h"
 
 void *test_A(void *arg){
-	int i = *(int*)arg;
+	int id = *(int*)arg;
 	int loop = 4;
 	while(loop > 0){
-		printf("thread %d: %d\n", i, loop);
+		printf("thread %d: %d\n", id, loop);
 		loop--;
 		green_yield();
 	}
+	return NULL;
 }
 
 void *test_B(void *arg){
 	int *ret = (int *)malloc(sizeof(int));
 	*ret = *(int*)arg + 3;
+	printf("Return value for funct TestB: %d \n", *ret);
 	return ret;
 }
 
@@ -22,7 +24,7 @@ void *test_B(void *arg){
 int main(){
 	green_t g0, g1, g2;
 	
-	int *retval_b;
+	int *retval_b = NULL;
 	
 	int a0 = 0;
 	int a1 = 1;

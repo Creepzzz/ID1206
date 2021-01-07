@@ -1,6 +1,5 @@
 #include <ucontext.h>
 
-/* Threads */
 typedef struct green_t {
 	ucontext_t *context; // context of thread
 	void *(*fun)(void*); // function to be executed
@@ -11,41 +10,35 @@ typedef struct green_t {
 	int zombie; // indicates if the thread has terminated or not
 } green_t;
 
-void green_thread();
+typedef struct green_cond_t {
+	struct green_t *susp_list;
+} green_cond_t;
+
+typedef struct green_mutex_t {
+	volatile int taken;
+	struct green_t *susp;
+} green_mutex_t;
+
+
+/* Green threads functions */
+void green_thread(void);
 int green_create(green_t *thread, void *(*fun)(void *), void *arg);
 int green_yield();
 int green_join(green_t *thread, void ** val);
 
+/* Queue functions */ 
+void enqueue(green_t **list, green_t *thread);
+green_t *dequeue(green_t **list);
 
-/* Queue */
-typedef struct Queue{
-	struct green_t *head;
-	struct green_t *tail;
-	//struct green_t *waiting;
-	int length;
-} Queue;
-
-struct Queue *create_queue(void);
-void enqueue(struct Queue *queue, void *thread);
-struct green_t *dequeue(struct Queue *queue);
-
-
-/* Conditionals */
-typedef struct green_cond_t {
-	struct Queue *susp_queue;
-} green_cond_t;
-
+/* Conditional functions */ 
 void green_cond_init(green_cond_t *cond);
-void green_cond_wait(green_cond_t *cond);
+void green_cond_wait(green_cond_t *cond, green_mutex_t *mutex);
 void green_cond_signal(green_cond_t *cond);
 
+/* Timer functions */
+void timer_handler(int);
 
-/* Mutex */
-typedef struct green_mutex_t {
-	volatile int taken;
-	struct Queue *mutex_queue;
-} green_mutex_t;
-
+/* Mutex functions */
 int green_mutex_init(green_mutex_t *mutex);
 int green_mutex_lock(green_mutex_t *mutex);
 int green_mutex_unlock(green_mutex_t *mutex);
