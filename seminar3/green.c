@@ -199,41 +199,6 @@ int green_join(struct green_t *thread, void **res){
 	return 0;
 }
 
-/*
-oucp = Old User Context Pointer ???
-
-_________________________________________________________________________________
-
-getcontext()		getcontext(ucp)
--------------
-Initializes the structure pointed at by ucp to the currently active context.
-
-
-_________________________________________________________________________________
-
-setcontext()		setcontext(ucp)
--------------
-Restores (continues) the user context pointed at by ucp. Context obtained by getcontext().
-
-
-_________________________________________________________________________________
-
-swapcontext()		swapcontext(oucp, ucp)
--------------
-Saves current context in structure pointed to pointed to by oucp and activates context pointed to by ucp.
-
-
-_________________________________________________________________________________
-
-makecontext()		makecontext(ucp, funct, argc)
--------------
-Modifies the context pointed to by ucp. When this context is later activated (using setcontext or swapcontext) the funct is called with argc. When returning, successor (->next???????????) context is activated.
-
-
-
-*/
-
-
 
 
 
