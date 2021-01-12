@@ -26,7 +26,6 @@ int main(){
 
 
 /* 1.2 Code and read only data
-
 int main(){
 	int pid = getpid();
 	
@@ -64,7 +63,6 @@ foo:
 	
 	
 /* 2.2 Back to stack 
-
 int main(){
 	int pid = getpid();
 	
@@ -99,7 +97,6 @@ int main(){
 
 
 /* 2.3 Pushing things to the stack */
-
 // handles the printing
 void zot(unsigned long *stop){
 	unsigned long r = 0x3;
@@ -138,6 +135,7 @@ back:
 }
 
 /* PRINTOUT: 
+
 	0x7fffd59b9268         0x3			zot: r
 	0x7fffd59b9270         0x7fffd59b9270		zot: i pointing to itself
 	0x7fffd59b9278         0x10e2b93700f48f00

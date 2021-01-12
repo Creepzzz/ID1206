@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -10,10 +8,19 @@ int main(){
 	
 	if(pid == 0){
 		//child
-		printf("Child: Here I am as well. I inherited mom's memory space.\n");
+		printf("child: Here I am as well. I inherited mom's memory space.\n");
 	} else {
 		//mother
-		printf("Mom: I'm here. I continue as usual. \n");
+		printf("mom: I'm here. I continue as usual. \n");
 	}
 	wait(NULL);
+	
+	return 0;
 }
+
+/* PRINTOUT:
+
+	mom: I'm here. I continue as usual. 
+	child: Here I am as well. I inherited mom's memory space.
+	
+*/
